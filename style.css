@@ -1,0 +1,46 @@
+/* Tùy chỉnh Font chữ mặc định */
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Tùy chỉnh thanh cuộn ngang mượt cho Category Nav */
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Style cho Button Nút Lọc Danh Mục */
+.cat-btn {
+    background-color: #ffffff;
+    color: #4b5563;
+    border-color: #e5e7eb;
+}
+
+.cat-btn:hover {
+    background-color: #f3f4f6;
+}
+
+.cat-btn.active {
+    background-color: #059669 !important;
+    color: #ffffff !important;
+    border-color: #059669 !important;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+}
+
+/* Smooth Transitions */
+#cartDrawer {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Card Hover Animations */
+.product-card {
+    transition: all 0.25s ease-in-out;
+}
+
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.1);
+}

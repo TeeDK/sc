@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodFlow - Đặt Món Ăn Trực Tuyến</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Link file CSS ngoài -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+
+    <!-- HEADER / NAVBAR -->
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="filterCategory('all')">
+                <div class="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                    <i class="fa-solid fa-bowl-food text-2xl"></i>
+                </div>
+                <div>
+                    <span class="text-2xl font-black tracking-tight text-gray-900">Food<span class="text-emerald-600">Flow</span></span>
+                    <span class="block text-xs text-emerald-600 font-semibold uppercase tracking-wider">Tươi ngon mỗi ngày</span>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="hidden md:flex flex-1 max-w-md mx-8 relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Tìm món ăn, đồ uống, món chay..." 
+                    class="w-full pl-11 pr-4 py-2.5 bg-gray-100 border border-transparent rounded-full focus:bg-white focus:border-emerald-500 focus:outline-none transition">
+            </div>
+
+            <!-- User & Cart Actions -->
+            <div class="flex items-center space-x-4">
+                <!-- User Profile / Auth Button -->
+                <div id="userSection">
+                    <button onclick="openAuthModal('login')" class="flex items-center space-x-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold px-4 py-2 rounded-xl transition">
+                        <i class="fa-regular fa-circle-user text-lg"></i>
+                        <span>Đăng nhập</span>
+                    </button>
+                </div>
+
+                <!-- Cart Button -->
+                <button onclick="toggleCart()" class="relative bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl font-semibold flex items-center space-x-2 transition shadow-md shadow-emerald-100">
+                    <i class="fa-solid fa-basket-shopping text-lg"></i>
+                    <span class="hidden sm:inline">Giỏ hàng</span>
+                    <span id="cartBadge" class="bg-amber-400 text-gray-900 font-bold text-xs px-2 py-0.5 rounded-full">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO BANNER -->
+    <section class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between relative z-10">
+            <div class="md:w-1/2 mb-8 md:mb-0">
+                <span class="bg-emerald-600 text-emerald-100 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full">Giao hàng nhanh 20 phút</span>
+                <h1 class="text-3xl sm:text-5xl font-extrabold mt-4 leading-tight">Thức Ăn Ngon & Món Chay Thanh Tịnh</h1>
+                <p class="mt-4 text-emerald-100 text-lg">Hơn 20+ món ăn thực tế được chuẩn bị từ nguồn nguyên liệu tươi sạch chuẩn VietGAP mỗi ngày.</p>
+                <div class="mt-6 flex flex-wrap gap-3">
+                    <button onclick="filterCategory('chay')" class="bg-amber-400 hover:bg-amber-300 text-gray-900 font-bold px-6 py-3 rounded-xl transition shadow-lg flex items-center space-x-2">
+                        <i class="fa-solid fa-leaf text-emerald-800"></i>
+                        <span>Khám phá Thực Đơn Chay</span>
+                    </button>
+                </div>
+            </div>
+            <div class="md:w-5/12">
+                <img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80" alt="Salad Healthy" class="rounded-3xl shadow-2xl border-4 border-white/20 transform -rotate-1 hover:rotate-0 transition duration-300">
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 w-full">
+        <!-- CATEGORY NAVIGATION -->
+        <div class="flex items-center space-x-3 overflow-x-auto pb-4 scrollbar-none" id="categoryNav">
+            <button onclick="filterCategory('all')" id="btn-cat-all" class="cat-btn active border px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition flex items-center space-x-2">
+                <i class="fa-solid fa-utensils"></i>
+                <span>Tất cả món</span>
+            </button>
+            <button onclick="filterCategory('chay')" id="btn-cat-chay" class="cat-btn border px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition flex items-center space-x-2 bg-emerald-50 text-emerald-700 border-emerald-200">
+                <i class="fa-solid fa-seedling text-emerald-600"></i>
+                <span>Đồ Ăn Chay (Thanh Tịnh)</span>
+            </button>
+            <button onclick="filterCategory('main')" id="btn-cat-main" class="cat-btn border px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition flex items-center space-x-2">
+                <i class="fa-solid fa-bowl-rice"></i>
+                <span>Cơm & Mì</span>
+            </button>
+            <button onclick="filterCategory('soup')" id="btn-cat-soup" class="cat-btn border px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition flex items-center space-x-2">
+                <i class="fa-solid fa-fire"></i>
+                <span>Bún & Phở</span>
+            </button>
+            <button onclick="filterCategory('drink')" id="btn-cat-drink" class="cat-btn border px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition flex items-center space-x-2">
+                <i class="fa-solid fa-glass-water"></i>
+                <span>Tráng miệng & Đồ uống</span>
+            </button>
+        </div>
+
+        <!-- PRODUCT GRID -->
+        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
+            <!-- Sản phẩm được render động bằng JavaScript -->
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-900 text-gray-400 py-10 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <span class="text-2xl font-black text-white">Food<span class="text-emerald-500">Flow</span></span>
+                <p class="mt-2 text-sm text-gray-400">Ứng dụng đặt món ăn trực tuyến nhanh chóng, tiện lợi với hàng trăm món ăn tươi ngon chuẩn vị.</p>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-3">Danh Mục Nổi Bật</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#" onclick="filterCategory('chay')" class="hover:text-emerald-400">Đồ ăn chay thanh tịnh</a></li>
+                    <li><a href="#" onclick="filterCategory('main')" class="hover:text-emerald-400">Cơm tấm & Mì xào</a></li>
+                    <li><a href="#" onclick="filterCategory('soup')" class="hover:text-emerald-400">Phở & Bún bò Huế</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-3">Liên Hệ & Hỗ Trợ</h4>
+                <p class="text-sm"><i class="fa-solid fa-phone text-emerald-500 mr-2"></i> Hotline: 1900 6868</p>
+                <p class="text-sm mt-2"><i class="fa-solid fa-location-dot text-emerald-500 mr-2"></i> Ho Chi Minh City, Vietnam</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL AUTH (ĐĂNG NHẬP / ĐĂNG KÝ) -->
+    <div id="authModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative">
+            <button onclick="closeAuthModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div id="authContent">
+                <!-- Nội dung Form Render bằng JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CHI TIẾT MÓN ĂN -->
+    <div id="detailModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+        <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl relative">
+            <button onclick="closeDetailModal()" class="absolute top-4 right-4 bg-white/80 hover:bg-white text-gray-800 w-9 h-9 rounded-full flex items-center justify-center shadow z-10">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div id="detailContent">
+                <!-- Nội dung Chi tiết món ăn Render bằng JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- CART SIDE DRAWER -->
+    <div id="cartDrawer" class="fixed inset-y-0 right-0 max-w-md w-full bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-6 bg-emerald-700 text-white flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-basket-shopping text-xl"></i>
+                <h3 class="text-xl font-bold">Giỏ Hàng Của Bạn</h3>
+            </div>
+            <button onclick="toggleCart()" class="text-white/80 hover:text-white">
+                <i class="fa-solid fa-xmark text-2xl"></i>
+            </button>
+        </div>
+
+        <div id="cartItemsList" class="flex-1 overflow-y-auto p-6 space-y-4">
+            <!-- Render danh sách sản phẩm trong giỏ -->
+        </div>
+
+        <div class="p-6 border-t bg-gray-50 space-y-4">
+            <div class="flex justify-between items-center text-gray-600">
+                <span>Tạm tính:</span>
+                <span id="cartSubtotal" class="font-bold text-gray-800">0đ</span>
+            </div>
+            <div class="flex justify-between items-center text-gray-600">
+                <span>Phí giao hàng:</span>
+                <span class="font-semibold text-emerald-600">15.000đ</span>
+            </div>
+            <div class="flex justify-between items-center text-xl font-extrabold text-gray-900 pt-2 border-t">
+                <span>Tổng cộng:</span>
+                <span id="cartTotal" class="text-emerald-600">0đ</span>
+            </div>
+            <button onclick="checkout()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-bold transition shadow-lg flex items-center justify-center space-x-2">
+                <span>Tiến Hành Đặt Hàng</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-gray-900 text-white px-6 py-3.5 rounded-2xl shadow-2xl z-50 flex items-center space-x-3 transition transform translate-y-20 opacity-0 pointer-events-none">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-xl"></i>
+        <span id="toastMsg" class="font-medium text-sm">Thông báo</span>
+    </div>
+
+    <!-- Link file JS ngoài -->
+    <script src="script.js"></script>
+</body>
+</html>
